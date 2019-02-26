@@ -89,7 +89,32 @@ int verify(point p, point a, point b) {
 }
 
 int inside(point p, point poly[], int n) {
-  return 0;
+  int n_cruza = 0;
+  for (int i = 1; i < n; i++){
+    int check = verify(p, poly[i-1], poly[i]);
+    if (check == 2){
+      return 1;
+    }
+    else if(check == 1){
+      n_cruza++;
+    }
+  }
+  int check = verify(p, poly[n-1], poly[0]);
+  if (check == 2){
+    return 1;
+  }
+  else if (check == 1){
+    n_cruza++;
+  }
+
+
+  double resto = n_cruza % 2;
+  if (resto != 0){
+    return 1;
+  }
+  else{
+    return 0;
+  }
 }
 
 // int main(){
