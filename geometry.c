@@ -1,4 +1,5 @@
 #include <math.h>
+//#include <stdio.h>
 
 #include "geometry.h"
 
@@ -43,36 +44,39 @@ int verify(point p, point a, point b) {
   else if(a.x == b.x){
     // Checa se os pontos a e p tem o mesmo x
     // Checa se o y do ponto p esta entra o y dos pontos a e b
-    if(smallery < p.y && largery >= p.y){
-      if(p.x == a.x){
-        return 2;
-      }
-      else if(p.x < a.x){
-        return 1;
-      }
-      else{
-        return 0;
-      }
+    if (p.x == a.x && smallery <= p.y && largery >= p.y){
+      return 2;
 
     }
+    else if(p.x < a.x && smallery < p.y && largery >= p.y){
+        return 1;
+      }
     else{
-      return 0;    
+      return 0;
     }
+
   }
   // Se os pontos nao tem o mesmo x nem o mesmo y, significa que eles formam uma reta diagonal
   else{
     // Calcula o m da equacao da reta
-    double m = (a.y - b.y) / (a.x - b.x);
+    double numerador = a.y-b.y;
+    double denominador = a.x-b.x;
+    double m = numerador/denominador;
     // Calcula o B da equacao da reta
     double n = a.y - (m * a.x);
     //Calcula valor de Y da reta dado x do ponto
     double resy = m * p.x + n;
     //Calcula valor de X da reta dado y do ponto
     double resx = (p.y - n) / m;
+    double pyd = (double) p.y;
+    double sub = fabs(pyd - resy);
 
-    double pxd = (double) p.x;
+    // printf("RESY: %lf    RESX: %lf   PYD: %lf     M: %lf    N %lf    SUB: %lf  \n",resy,resx,pyd,m,n,sub);
+
+
+
     // Checa se o y do ponto p eh igual ao y da reta dado o x de p
-    if(abs(p.y - resy) <= 0.000001 && smallery < p.y && largery >= p.y){
+    if( sub <= 0.000001 && smallery <= p.y && largery >= p.y){
       return 2;
     }
     else if(resx>p.x && smallery < p.y && largery >= p.y){
@@ -87,3 +91,19 @@ int verify(point p, point a, point b) {
 int inside(point p, point poly[], int n) {
   return 0;
 }
+
+// int main(){
+//   point a;
+//   point b;
+//   point p;
+//   a.x = 0;
+//   a.y = 1;
+//   p.x = 2;
+//   p.y = 2;
+//   b.x = 4;
+//   b.y = 4;
+
+//   int res = verify(p,a,b);
+//   printf("%d",res);
+//   return 1;
+// }
