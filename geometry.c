@@ -40,6 +40,9 @@ int verify(point p, point a, point b) {
         return 2;
       }
     }
+    // else{
+    //   return 0;
+    // }
   }
   // Checa se os pontos a e b tem o mesmo x, o que significa que eles formam uma reta vertical
   else if(a.x == b.x){
@@ -49,6 +52,14 @@ int verify(point p, point a, point b) {
       if(smallery <= p.y && largery >= p.y){
         return 2;
       }
+    }
+    else{
+      if(p.y>smallery && p.y<=largery){
+        return 1;
+      }
+      // else{
+      //   return 0;
+      // }
     }
 
   }
