@@ -1,39 +1,37 @@
 #include <math.h>
-//#include <stdio.h>
-
 #include "geometry.h"
 
 int verify(point p, point a, point b) {
 
-  int largerx;
-  int smallerx;
-  int largery;
-  int smallery;
+  int largerX;
+  int smallerX;
+  int largerY;
+  int smallerY;
 
   // Checa qual ponto (entre a e b) tem o maior x
   if(a.x - b.x > 0){
-    largerx = a.x;
-    smallerx = b.x;
+    largerX = a.x;
+    smallerX = b.x;
   }
   else{
-    largerx = b.x;
-    smallerx = a.x;
+    largerX = b.x;
+    smallerX = a.x;
   }
 
   // Checa qual ponto (entre a e b) tem o maior y
   if(a.y - b.y > 0){
-    largery = a.y;
-    smallery = b.y;
+    largerY = a.y;
+    smallerY = b.y;
   }
   else{
-    largery = b.y;
-    smallery = a.y;
+    largerY = b.y;
+    smallerY = a.y;
   }
 
   // Checa se os pontos a e b tem o mesmo y, o que significa que eles formam uma reta horizontal
   if((a.y == b.y)){
     // Checa se os pontos a e p tem o mesmo y e se o x do ponto p esta entra o x dos pontos a e b
-    if(p.y == a.y && smallerx <= p.x && largerx >= p.x){
+    if(p.y == a.y && smallerX <= p.x && largerX >= p.x){
       return 2; 
     }
     else{
@@ -44,11 +42,13 @@ int verify(point p, point a, point b) {
   else if(a.x == b.x){
     // Checa se os pontos a e p tem o mesmo x
     // Checa se o y do ponto p esta entra o y dos pontos a e b
-    if (p.x == a.x && smallery <= p.y && largery >= p.y){
+    if (p.x == a.x && smallerY <= p.y && largerY >= p.y){
       return 2;
 
     }
-    else if(p.x < a.x && smallery < p.y && largery >= p.y){
+    // Checa se o ponto esta entre o intervalo de a.y e b.y levando em conta a perturbação 
+    // Checa se o p.x está à esquerda da reta vertical
+    else if(p.x < a.x && smallerY < p.y && largerY >= p.y){
         return 1;
       }
     else{
@@ -58,24 +58,29 @@ int verify(point p, point a, point b) {
   }
   // Se os pontos nao tem o mesmo x nem o mesmo y, significa que eles formam uma reta diagonal
   else{
-    // Calcula o m da equacao da reta
+    // Calcula o coeficiente angular da equacao da reta
     double numerador = a.y-b.y;
     double denominador = a.x-b.x;
     double m = numerador/denominador;
-    // Calcula o B da equacao da reta
+    // Calcula o coeficiente linear da equacao da reta
     double n = a.y - (m * a.x);
     //Calcula valor de Y da reta dado x do ponto
-    double resy = m * p.x + n;
+    double resY = m * p.x + n;
     //Calcula valor de X da reta dado y do ponto
-    double resx = (p.y - n) / m;
-    double pyd = (double) p.y;
-    double sub = fabs(pyd - resy);
+    double resX = (p.y - n) / m;
+
+    //Subtrai os valores do y do ponto e o y na reta dado o x do ponto
+    double pyD = (double) p.y;
+    double sub = fabs(pyD - resY);
 
     // Checa se o y do ponto p eh igual ao y da reta dado o x de p
-    if( sub <= 0.000001 && smallery <= p.y && largery >= p.y){
+    if( sub <= 0.000001 && smallerY <= p.y && largerY >= p.y){
       return 2;
     }
-    else if(resx>p.x && smallery < p.y && largery >= p.y){
+
+    // Checa se o x da reta dado o y do ponto está à diretia do x do ponto
+    // Checa se o y do ponto esta entre os y do segmento de reta levando em conta a perturbação
+    else if(resX>p.x && smallerY < p.y && largerY >= p.y){
       return 1;
     }
     else{
@@ -85,6 +90,9 @@ int verify(point p, point a, point b) {
 }
 
 int inside(point p, point poly[], int n) {
+
+  //Itera sobre os pontos de 0 < n-1 e checa se cruza a aresta
+  //Se cruzar soma 1 no contador, caso o ponto esteja em cima de alguma aresta já retorna 1
   int n_cruza = 0;
   for (int i = 1; i < n; i++){
     int check = verify(p, poly[i-1], poly[i]);
@@ -95,6 +103,7 @@ int inside(point p, point poly[], int n) {
       n_cruza++;
     }
   }
+  //Faz os mesmos checks na reta de n-1 com 0
   int check = verify(p, poly[n-1], poly[0]);
   if (check == 2){
     return 1;
@@ -103,7 +112,7 @@ int inside(point p, point poly[], int n) {
     n_cruza++;
   }
 
-
+  //Divide o contador por 2 para checar se é par ou ímpar
   double resto = n_cruza % 2;
   if (resto != 0){
     return 1;
